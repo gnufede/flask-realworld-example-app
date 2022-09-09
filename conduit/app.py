@@ -7,6 +7,24 @@ from conduit import commands, user, profile, articles
 from conduit.settings import ProdConfig
 from conduit.exceptions import InvalidUsage
 
+try:
+    from ddtrace import config
+    import os
+
+    # Enable query string tracing
+    trace_query_string = bool(
+        os.getenv("DD_TRACE_QUERY_STRING", "False").lower()
+        in (
+            "true",
+            "1",
+            "t",
+        )
+    )
+    config.flask["trace_query_string"] = trace_query_string
+    config.http.trace_query_string = trace_query_string
+except ImportError:
+    pass
+
 
 def create_app(config_object=ProdConfig):
     """An application factory, as explained here:
